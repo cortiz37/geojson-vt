@@ -54,7 +54,8 @@ GeoJSONVT.prototype.options = {
     lineMetrics: false,     // whether to calculate line metrics
     promoteId: null,        // name of a feature property to be promoted to feature.id
     generateId: false,      // whether to generate feature ids. Cannot be used with promoteId
-    debug: 0                // logging level (0, 1 or 2)
+    simple: false,          // simple xy maps
+    tileSize: 256           // simple maps tiles size, only when simple = true
 };
 
 GeoJSONVT.prototype.splitTile = function (features, z, x, y, cz, cx, cy) {
@@ -161,6 +162,10 @@ GeoJSONVT.prototype.getTile = function (z, x, y) {
 
     const z2 = 1 << z;
     x = ((x % z2) + z2) % z2; // wrap tile x coordinate
+
+    if (options.simple) {
+        y = y + (1 << (z - 1)); // xy map
+    }
 
     const id = toID(z, x, y);
     if (this.tiles[id]) return transform(this.tiles[id], extent);
